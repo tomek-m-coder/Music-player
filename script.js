@@ -7,22 +7,22 @@ let currentSong = 0;
 const songs = [
     {
       name: 'Rising',
-      displayName: 'Adventure-Type-Beat',
+      displayName: 'Rising',
       artist: 'Thomas-Anstey-Lewis',
     },
     {
      name: 'Freeway',
-      displayName: 'Adventure-Type-Beat',
+      displayName: 'Freeway',
       artist: 'Thomas-Anstey-Lewis',
     },
     {
      name: 'Forsaken',
-      displayName: 'Adventure-Type-Beat',
+      displayName: 'Forsaken',
       artist: 'Thomas-Anstey-Lewis',
     },
     {
       name: 'Overcoming',
-      displayName: 'Adventure-Type-Beat',
+      displayName: 'Overcoming',
       artist: 'Thomas-Anstey-Lewis',
     },
   ];
@@ -94,4 +94,38 @@ function pauseSong() {
     const clickX = e.offsetX;
     const { duration } = music;
     music.currentTime = (clickX / width) * duration;
-  }  
+  }
+  // Function for next song
+function nextSong() {
+    currentSong < songs.length - 1 ? currentSong++ : (currentSong = 0);
+    loadSong(songs[currentSong]);
+    playSong();
+  }
+  
+  // function for previous song
+  function previousSong() {
+    currentSong <= 0 ? (currentSong = songs.length - 1) : currentSong--;
+    loadSong(songs[currentSong]);
+    playSong();
+  }
+  
+  // On Load - Select First Song
+  loadSong(songs[currentSong]);
+  
+  // Play or Pause Event Listener
+  playBtn.addEventListener('click', () => (isPlaying ? pauseSong() : playSong()));
+  
+  // Skip event listener
+  nextBtn.addEventListener('click', nextSong);
+  
+  // Previous event listener
+  prevBtn.addEventListener('click', previousSong);
+  
+  // Update progress bar
+  music.addEventListener('timeupdate', updateProgress);
+  
+  // Play the next song when the song ends
+  music.addEventListener('ended', nextSong);
+  
+  // Click on progress bar to search through the song
+  progressContainer.addEventListener('click', setProgressBar);  
