@@ -132,3 +132,47 @@ h3 {
 .duration-wrapper{
   font-weight: 400;
 }
+/* Volume Control */
+.player-controls {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+  top: -15px;
+  margin-left:57px;
+  margin-right:10px;
+}
+
+.volume-container {
+  margin-left: 15px; /* Odstęp pomiędzy kontrolkami a suwakiem */
+  margin-right:45px;
+  height: 50px; /* Wysokość kontenera */
+  display: flex;
+  align-items: center;
+}
+
+#volume-slider {
+  width: 50px; /* Długość suwaka */
+  -webkit-appearance: none;
+  appearance: none;
+  background: #ddd;
+  border-radius: 5px;
+}
+
+#volume-slider::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 8px;
+  height: 4px;
+  background:rgb(74, 68, 99);
+  cursor: pointer;
+  border-radius: 0%;
+}
+
+#volume-slider::-webkit-slider-runnable-track {
+  width: 60%;
+  height: 5px;
+  cursor: pointer;
+  background: #69b0df;
+  border-radius: 5px;
+}

@@ -28,13 +28,17 @@
           <span id="duration">2:17</span>
         </div>
       </div>
+    
       <!-- Controls -->
       <div class="player-controls">
         <i class="fas fa-backward" id="prev" title="Previous"></i>
         <i class="fas fa-play main-button" id="play" title="Play"></i>
         <i class="fas fa-forward" id="next" title="Next"></i>
+        <!-- Suwak głośności -->
+        <div class="volume-container">
+          <input type="range" id="volume-slider" min="0" max="1" step="0.01" value="1" />
+        </div>
       </div>
-    </div>
     <!-- Script -->
     <script src="script.js"></script>
   </body>

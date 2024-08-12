@@ -10,6 +10,7 @@ const durationEl = getElem('#duration');
 const prevBtn = getElem('#prev');
 const playBtn = getElem('#play');
 const nextBtn = getElem('#next');
+const volumeSlider = getElem('#volume-slider');
 
 // Zmienna do przechowywania AudioContext
 let audioContext, analyser, dataArray, animationId;
@@ -160,6 +161,11 @@ function startVisualization() {
   changeBackgroundColor();
 }
 
+// Funkcja do zmiany głośności
+function changeVolume(e) {
+  music.volume = e.target.value;
+}
+
 // Ładowanie pierwszej piosenki przy uruchomieniu strony
 loadSong(songs[currentSong]);
 
@@ -170,45 +176,4 @@ prevBtn.addEventListener('click', previousSong);
 music.addEventListener('timeupdate', updateProgress);
 music.addEventListener('ended', nextSong);
 progressContainer.addEventListener('click', setProgressBar);
-
-
-//Background-color Changing
-document.addEventListener('DOMContentLoaded', function() {
-    const audioPlayer = document.getElementById('audio-player');
-    const audioContext = new (window.AudioContext || window.webkitAudioContext)();
-    const analyser = audioContext.createAnalyser();
-    const source = audioContext.createMediaElementSource(audioPlayer);
-
-    source.connect(analyser);
-    analyser.connect(audioContext.destination);
-
-    analyser.fftSize = 256;
-    const bufferLength = analyser.frequencyBinCount;
-    const dataArray = new Uint8Array(bufferLength);
-
-    function changeBackgroundColor() {
-        analyser.getByteFrequencyData(dataArray);
-
-        // Pobieranie średniej wartości częstotliwości
-        let sum = 0;
-        for(let i = 0; i < bufferLength; i++) {
-            sum += dataArray[i];
-        }
-        const average = sum / bufferLength;
-
-        // Konwersja średniej na kolor (RGB)
-        const red = Math.min(255, average * 2);
-        const green = 100;
-        const blue = 255 - red;
-
-        document.body.style.backgroundColor = `rgb(${red}, ${green}, ${blue})`;
-
-        requestAnimationFrame(changeBackgroundColor);
-    }
-
-    audioPlayer.addEventListener('play', function() {
-        audioContext.resume().then(() => {
-            changeBackgroundColor();
-        });
-    });
-});
+volumeSlider.addEventListener('input', changeVolume);
