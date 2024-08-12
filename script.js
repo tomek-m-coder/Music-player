@@ -1,4 +1,4 @@
-// Elements
+// Elementy DOM
 const image = getElem('img');
 const title = getElem('#title');
 const artist = getElem('#artist');
@@ -11,10 +11,13 @@ const prevBtn = getElem('#prev');
 const playBtn = getElem('#play');
 const nextBtn = getElem('#next');
 
-// Counter for current song
+// Zmienna do przechowywania AudioContext
+let audioContext, analyser, dataArray, animationId;
+
+// Zmienna do śledzenia aktualnie odtwarzanej piosenki
 let currentSong = 0;
 
-// Music
+// Lista piosenek
 const songs = [
   {
     name: 'Vol. 1',
@@ -38,31 +41,33 @@ const songs = [
   },
 ];
 
-// Check if song is playing
+// Sprawdzenie, czy piosenka jest odtwarzana
 let isPlaying = false;
 
-// Function to get elements by id
+// Funkcja do pobierania elementów
 function getElem(id) {
   return document.querySelector(id);
 }
 
-// Function to Play Song
+// Funkcja do odtwarzania piosenki
 function playSong() {
   isPlaying = true;
   playBtn.classList.replace('fa-play', 'fa-pause');
   playBtn.setAttribute('title', 'Pause');
   music.play();
+  startVisualization();  // Rozpoczęcie wizualizacji
 }
 
-// Function to pause Song
+// Funkcja do pauzowania piosenki
 function pauseSong() {
   isPlaying = false;
   playBtn.classList.replace('fa-pause', 'fa-play');
   playBtn.setAttribute('title', 'Play');
   music.pause();
+  cancelAnimationFrame(animationId);  // Zatrzymanie wizualizacji
 }
 
-// Update DOM
+// Funkcja do załadowania piosenki
 function loadSong(song) {
   title.textContent = song.displayName;
   artist.textContent = song.artist;
@@ -70,28 +75,28 @@ function loadSong(song) {
   image.src = `img/${song.name}.jfif`;
 }
 
-// Function to update progress
+// Funkcja do aktualizacji paska postępu
 function updateProgress(e) {
   if (isPlaying) {
     const { duration, currentTime } = e.srcElement;
 
-    // Update Progress Bar width
+    // Aktualizacja szerokości paska postępu
     const progressPercent = (currentTime / duration) * 100;
     progress.style.width = `${progressPercent}%`;
 
-    // Calculate Display for the duration
+    // Obliczanie wyświetlania czasu trwania
     const durationMinutes = Math.floor(duration / 60);
     let durationSeconds = Math.floor(duration % 60);
     if (durationSeconds < 10) {
       durationSeconds = `0${durationSeconds}`;
     }
 
-    // Delay switching the duration element to avoid NaN
+    // Opóźnienie przełączania elementu duration, aby uniknąć NaN
     if (durationSeconds) {
       durationEl.textContent = `${durationMinutes}:${durationSeconds}`;
     }
 
-    // Calculate Display for the current time
+    // Obliczanie wyświetlania bieżącego czasu
     const currentMinutes = Math.floor(currentTime / 60);
     let currentSeconds = Math.floor(currentTime % 60);
     if (currentSeconds < 10) {
@@ -102,7 +107,7 @@ function updateProgress(e) {
   }
 }
 
-// Function to set the time of the song by clicking the progress bar
+// Funkcja do ustawiania czasu piosenki przez kliknięcie na pasek postępu
 function setProgressBar(e) {
   const width = this.clientWidth;
   const clickX = e.offsetX;
@@ -110,37 +115,100 @@ function setProgressBar(e) {
   music.currentTime = (clickX / width) * duration;
 }
 
-// Function for next song
+// Funkcja do odtwarzania następnej piosenki
 function nextSong() {
   currentSong < songs.length - 1 ? currentSong++ : (currentSong = 0);
   loadSong(songs[currentSong]);
   playSong();
 }
 
-// function for previous song
+// Funkcja do odtwarzania poprzedniej piosenki
 function previousSong() {
   currentSong <= 0 ? (currentSong = songs.length - 1) : currentSong--;
   loadSong(songs[currentSong]);
   playSong();
 }
 
-// On Load - Select First Song
+// Inicjalizacja kontekstu audio i analizatora
+function initAudioContext() {
+  if (!audioContext) {
+    audioContext = new (window.AudioContext || window.webkitAudioContext)();
+    const source = audioContext.createMediaElementSource(music);
+    analyser = audioContext.createAnalyser();
+    source.connect(analyser);
+    analyser.connect(audioContext.destination);
+    analyser.fftSize = 256;
+    const bufferLength = analyser.frequencyBinCount;
+    dataArray = new Uint8Array(bufferLength);
+  }
+}
+
+// Funkcja do zmiany koloru tła na podstawie muzyki
+function changeBackgroundColor() {
+  analyser.getByteFrequencyData(dataArray);
+  const avg = dataArray.reduce((a, b) => a + b) / dataArray.length;
+  const red = Math.min(255, avg * 2);
+  const green = 100;
+  const blue = 255 - red;
+  document.body.style.backgroundColor = `rgb(${red}, ${green}, ${blue})`;
+  animationId = requestAnimationFrame(changeBackgroundColor);
+}
+
+// Funkcja do rozpoczęcia wizualizacji
+function startVisualization() {
+  initAudioContext();
+  changeBackgroundColor();
+}
+
+// Ładowanie pierwszej piosenki przy uruchomieniu strony
 loadSong(songs[currentSong]);
 
-// Play or Pause Event Listener
+// Obsługa zdarzeń dla przycisków
 playBtn.addEventListener('click', () => (isPlaying ? pauseSong() : playSong()));
-
-// Skip event listener
 nextBtn.addEventListener('click', nextSong);
-
-// Previous event listener
 prevBtn.addEventListener('click', previousSong);
-
-// Update progress bar
 music.addEventListener('timeupdate', updateProgress);
-
-// Play the next song when the song ends
 music.addEventListener('ended', nextSong);
-
-// Click on progress bar to search through the song
 progressContainer.addEventListener('click', setProgressBar);
+
+
+//Background-color Changing
+document.addEventListener('DOMContentLoaded', function() {
+    const audioPlayer = document.getElementById('audio-player');
+    const audioContext = new (window.AudioContext || window.webkitAudioContext)();
+    const analyser = audioContext.createAnalyser();
+    const source = audioContext.createMediaElementSource(audioPlayer);
+
+    source.connect(analyser);
+    analyser.connect(audioContext.destination);
+
+    analyser.fftSize = 256;
+    const bufferLength = analyser.frequencyBinCount;
+    const dataArray = new Uint8Array(bufferLength);
+
+    function changeBackgroundColor() {
+        analyser.getByteFrequencyData(dataArray);
+
+        // Pobieranie średniej wartości częstotliwości
+        let sum = 0;
+        for(let i = 0; i < bufferLength; i++) {
+            sum += dataArray[i];
+        }
+        const average = sum / bufferLength;
+
+        // Konwersja średniej na kolor (RGB)
+        const red = Math.min(255, average * 2);
+        const green = 100;
+        const blue = 255 - red;
+
+        document.body.style.backgroundColor = `rgb(${red}, ${green}, ${blue})`;
+
+        requestAnimationFrame(changeBackgroundColor);
+    }
+
+    audioPlayer.addEventListener('play', function() {
+        audioContext.resume().then(() => {
+            changeBackgroundColor();
+        });
+    });
+});
