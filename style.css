@@ -1,4 +1,5 @@
 /* Images created by: https://unsplash.com/@pawel_czerwinski */
+@import url('https://fonts.googleapis.com/css2?family=Spartan:wght@400;700&display=swap');
 
 html {
   box-sizing: border-box;
@@ -11,19 +12,33 @@ body {
   display: flex;
   justify-content: center;
   align-items: center;
-
+  font-family: 'Spartan', Arial, Helvetica, sans-serif;
   font-size: 12px;
 }
 
-
+.player-container {
+  height: 500px;
+  width: 400px;
+  background: #e9e9e9;
+  border-radius: 20px;
+  box-shadow: 0 15px 30px 5px rgba(0, 0, 0, 0.3);
+}
 
 .img-container {
-
+  height: 300px;
+  width: 300px;
   position: relative;
   top: -50px;
   left: 50px;
 }
 
+.img-container img {
+  height: 100%;
+  width: 100%;
+  object-fit: cover;
+  border-radius: 20px;
+  box-shadow: 0 5px 30px 5px rgba(0, 0, 0, 0.5);
+}
 
 h2 {
   font-size: 25px;
@@ -52,8 +67,7 @@ h3 {
   background: #242323;
   border-radius: 5px;
   height: 100%;
-  /* change this to show progress */
-  width: 66%;
+  width: 0%; /* change this to show progress */
   transition: width 0.1s linear;
 }
 
@@ -76,10 +90,13 @@ h3 {
   font-size: 30px;
   color: rgb(129, 129, 129);
   margin-right: 30px;
-
+  cursor: pointer;
+  user-select: none;
 }
 
-
+.fas:hover {
+  filter: brightness(80%);
+}
 
 .main-button {
   font-size: 40px;
@@ -89,7 +106,9 @@ h3 {
 
 /* Media Query: iPhone (Vertical) */
 @media screen and (max-width: 376px) {
-
+  .player-container {
+    width: 95vw;
+  }
 
   .img-container {
     left: 29px;
